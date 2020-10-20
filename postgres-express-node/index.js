@@ -1,21 +1,21 @@
-const { sequelize, User, MedicalTest } = require("./models");
+const { sequelize, User, MedicalTest } = require('./models');
 const {
   fieldEncryption,
   encrypt,
   decrypt,
-} = require("./services/sequelize-field-encrypt");
+} = require('./services/sequelize-field-encrypt');
 
-const crypto = require("crypto");
-const fs = require("fs");
-const { ecb: cipher } = require("./services/ciphers");
+const crypto = require('crypto');
+const fs = require('fs');
+const { ecb: cipher } = require('./services/ciphers');
 
 async function assertDatabaseConnectionOk() {
   console.log(`Checking database connection...`);
   try {
     await sequelize.authenticate();
-    console.log("Connection has been established successfully.");
+    console.log('Connection has been established successfully.');
   } catch (error) {
-    console.error("Unable to connect to the database:", error);
+    console.error('Unable to connect to the database:', error);
     process.exit(1);
   }
 }
@@ -35,10 +35,10 @@ async function getMedicalTests(options = {}) {
   return tests;
 }
 
-async function getMedicalTestsForUser(username = "") {
+async function getMedicalTestsForUser(username = '') {
   let user = await getUserByUsername(username, {
-    attributes: ["username"], // get only the username
-    include: { model: MedicalTest, attributes: ["name", "result"] },
+    attributes: ['username'], // get only the username
+    include: { model: MedicalTest, attributes: ['name', 'result'] },
   });
   return user && user.MedicalTests ? user.MedicalTests : [];
 }
@@ -102,13 +102,13 @@ async function init() {
    * * Message authentication (hash and MAC crypto functions)
    */
   try {
-    const secret = "my supper secret";
-    let message = "Authenticate this message.";
+    const secret = 'my supper secret';
+    let message = 'Authenticate this message.';
 
-    let hmac = crypto.createHmac("sha256", secret); // ! Message authentication code
+    let hmac = crypto.createHmac('sha256', secret); // ! Message authentication code
     let authTag = hmac.update(message).digest(); // ! Message digest/authentication code
     console.table([
-      { message, "message digest/authentication tag": authTag.toString("hex") },
+      { message, 'message digest/authentication tag': authTag.toString('hex') },
     ]);
 
     // * ===============================
@@ -116,35 +116,35 @@ async function init() {
     // *--------------------------------
     const CREATE_TAG = false;
 
-    if (CREATE_TAG) {
-      // * Authenticate the file
+    // if (CREATE_TAG) {
+    //   // * Authenticate the file
 
-      const input = fs.createReadStream("test.txt");
-      const output = fs.createWriteStream("test.tag");
-      const hmac = crypto.createHmac("sha256", secret);
+    //   const input = fs.createReadStream("test.txt");
+    //   const output = fs.createWriteStream("test.tag");
+    //   const hmac = crypto.createHmac("sha256", secret);
 
-      hmac.update("text.txt"); // ! Protecting the file name
-      input
-        .pipe(hmac) // ! Protecting the file content
-        .pipe(output)
-        .on("finish", () => output.end());
-    } else {
-      // * Verify the file authenticity
+    //   hmac.update("text.txt"); // ! Protecting the file name
+    //   input
+    //     .pipe(hmac) // ! Protecting the file content
+    //     .pipe(output)
+    //     .on("finish", () => output.end());
+    // } else {
+    //   // * Verify the file authenticity
 
-      const input = fs.createReadStream("test.txt");
-      const tag = fs.readFileSync("test.tag");
-      const hmac = crypto.createHmac("sha256", secret); // ! Message authentication code
+    //   const input = fs.createReadStream("test.txt");
+    //   const tag = fs.readFileSync("test.tag");
+    //   const hmac = crypto.createHmac("sha256", secret); // ! Message authentication code
 
-      hmac.update("text.txt");
-      input.pipe(hmac).on("finish", () => {
-        const isMessageAuthentic = crypto.timingSafeEqual(hmac.read(), tag); // ! Compare the auth tags
-        console.log(
-          `The file "test.txt" ${
-            isMessageAuthentic ? "IS" : "IS NOT"
-          } authentic.`
-        );
-      });
-    }
+    //   hmac.update("text.txt");
+    //   input.pipe(hmac).on("finish", () => {
+    //     const isMessageAuthentic = crypto.timingSafeEqual(hmac.read(), tag); // ! Compare the auth tags
+    //     console.log(
+    //       `The file "test.txt" ${
+    //         isMessageAuthentic ? "IS" : "IS NOT"
+    //       } authentic.`
+    //     );
+    //   });
+    // }
   } catch (err) {
     console.log(err.message);
   }

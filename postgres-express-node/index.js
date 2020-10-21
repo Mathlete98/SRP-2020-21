@@ -103,7 +103,7 @@ async function init() {
    */
   try {
     const secret = 'my supper secret';
-    let message = 'Authenticate this message.';
+    let message = 'authenticate this message.';
 
     let hmac = crypto.createHmac('sha256', secret); // ! Message authentication code
     let authTag = hmac.update(message).digest(); // ! Message digest/authentication code
